@@ -10,8 +10,8 @@ type CandidateCardProps = {
 
 export function CandidateCard({ candidate, onClick }: CandidateCardProps) {
     return (
-        <Button
-            type="button"
+        <div
+
             onClick={onClick}
             className="candidate-card group text-left"
         >
@@ -55,6 +55,6 @@ export function CandidateCard({ candidate, onClick }: CandidateCardProps) {
                     Choisir cette candidate
                 </Button>
             </div>
-        </Button>
+        </div>
     );
 }
