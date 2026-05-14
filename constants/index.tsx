@@ -2,7 +2,7 @@ import { Candidate } from "@/types";
 
 
 
-export const VOTE_PRICE = 100;
+export const VOTE_PRICE = 50;
 
 export const candidates: Candidate[] = [
     {
@@ -86,24 +86,24 @@ export const candidate = [
         name: "Grâce Mireille",
         category: "Miss",
         image: "/candidates/candidate-1.jpg",
-        votes: 1250,
-        amount: 125000,
+        votes: 10,
+        amount: 1000,
     },
     {
         id: "2",
-        name: "Kevin Armel",
-        category: "Master",
+        name: "Kevine Armelle",
+        category: "Miss",
         image: "/candidates/candidate-2.jpg",
-        votes: 980,
-        amount: 98000,
+        votes: 1,
+        amount: 100,
     },
     {
         id: "3",
         name: "Stéphanie Laure",
         category: "Miss",
         image: "/candidates/candidate-3.jpg",
-        votes: 760,
-        amount: 76000,
+        votes: 50,
+        amount: 5000,
     },
     {
         id: "4",

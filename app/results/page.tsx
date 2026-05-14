@@ -11,7 +11,6 @@ import {
     Users,
 } from "lucide-react";
 
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +25,7 @@ const formatNumber = (value: number) => {
     return new Intl.NumberFormat("fr-FR").format(value);
 };
 
-export default function ResultsPage() {
+const ResultsPage = () => {
     const {
         data: results = [],
         isLoading,
@@ -41,9 +40,12 @@ export default function ResultsPage() {
         0
     );
 
-    const missResults = results.filter((candidate) => candidate.category === "Miss");
-    const masterResults = results.filter(
+    const missResults = results.filter(
         (candidate) => candidate.category === "Miss"
+    );
+
+    const masterResults = results.filter(
+        (candidate) => candidate.category === "Master"
     );
 
     const leader = results[0];
@@ -60,6 +62,7 @@ export default function ResultsPage() {
                         >
                             <Link href="/">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
+                                Retour
                             </Link>
                         </Button>
 
@@ -78,7 +81,8 @@ export default function ResultsPage() {
                         className="rounded-full bg-[#b8252c] font-bold hover:bg-[#d32d35]"
                     >
                         <RefreshCw
-                            className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+                            className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""
+                                }`}
                         />
                         Actualiser
                     </Button>
@@ -131,6 +135,7 @@ export default function ResultsPage() {
                             <p className="text-lg font-black text-red-300">
                                 Impossible de charger les résultats.
                             </p>
+
                             <p className="mt-2 text-sm text-white/55">
                                 {error instanceof Error
                                     ? error.message
@@ -173,7 +178,9 @@ export default function ResultsPage() {
 
                                     <div>
                                         <p className="text-sm text-white/50">Candidates Miss</p>
-                                        <p className="text-3xl font-black">{missResults.length}</p>
+                                        <p className="text-3xl font-black">
+                                            {missResults.length}
+                                        </p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -212,7 +219,10 @@ export default function ResultsPage() {
                         {results.length === 0 ? (
                             <Card className="glass mt-8 rounded-[2rem] border-white/10 text-white">
                                 <CardContent className="p-8 text-center">
-                                    <p className="text-2xl font-black">Aucun vote pour le moment</p>
+                                    <p className="text-2xl font-black">
+                                        Aucun vote pour le moment
+                                    </p>
+
                                     <p className="mt-3 text-white/55">
                                         Les résultats apparaîtront dès que les premiers paiements
                                         seront confirmés.
@@ -231,11 +241,13 @@ export default function ResultsPage() {
 
                                     <CardContent className="space-y-4">
                                         {results.map((candidate, index) => {
+                                            const candidateVotes = Number(
+                                                candidate.total_votes || 0
+                                            );
+
                                             const percentage =
                                                 totalVotes > 0
-                                                    ? Math.round(
-                                                        (Number(candidate.total_votes) / totalVotes) * 100
-                                                    )
+                                                    ? Math.round((candidateVotes / totalVotes) * 100)
                                                     : 0;
 
                                             const isFirst = index === 0;
@@ -260,16 +272,24 @@ export default function ResultsPage() {
                                                             </div>
 
                                                             <div className="relative h-14 w-14 overflow-hidden rounded-2xl bg-white/10">
-                                                                <Image
-                                                                    src={candidate.image_url}
-                                                                    alt={candidate.name}
-                                                                    fill
-                                                                    className="object-cover"
-                                                                />
+                                                                {candidate.image_url ? (
+                                                                    <Image
+                                                                        src={candidate.image_url}
+                                                                        alt={candidate.name}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex h-full w-full items-center justify-center text-xs text-white/40">
+                                                                        N/A
+                                                                    </div>
+                                                                )}
                                                             </div>
 
                                                             <div>
-                                                                <p className="font-black">{candidate.name}</p>
+                                                                <p className="font-black">
+                                                                    {candidate.name}
+                                                                </p>
                                                                 <p className="text-sm text-white/50">
                                                                     {candidate.category} · {candidate.faculty}
                                                                 </p>
@@ -278,7 +298,7 @@ export default function ResultsPage() {
 
                                                         <div className="text-right">
                                                             <p className="text-2xl font-black">
-                                                                {formatNumber(candidate.total_votes)}
+                                                                {formatNumber(candidateVotes)}
                                                             </p>
                                                             <p className="text-xs text-white/45">votes</p>
                                                         </div>
@@ -306,12 +326,18 @@ export default function ResultsPage() {
                                         <Card className="glass rounded-[2rem] border-[#ffb4b8]/30 text-white">
                                             <CardContent className="p-5">
                                                 <div className="relative h-[420px] overflow-hidden rounded-[1.5rem] bg-white/10">
-                                                    <Image
-                                                        src={leader.image_url}
-                                                        alt={leader.name}
-                                                        fill
-                                                        className="object-cover"
-                                                    />
+                                                    {leader.image_url ? (
+                                                        <Image
+                                                            src={leader.image_url}
+                                                            alt={leader.name}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center text-white/40">
+                                                            Aucune image
+                                                        </div>
+                                                    )}
 
                                                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/90" />
 
@@ -335,7 +361,8 @@ export default function ResultsPage() {
                                                         </p>
 
                                                         <p className="mt-4 text-4xl font-black">
-                                                            {formatNumber(leader.total_votes)} votes
+                                                            {formatNumber(Number(leader.total_votes || 0))}{" "}
+                                                            votes
                                                         </p>
                                                     </div>
                                                 </div>
@@ -372,3 +399,5 @@ export default function ResultsPage() {
         </main>
     );
 }
+
+export default ResultsPage

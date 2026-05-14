@@ -1,10 +1,26 @@
-import { CandidateResult } from "@/constants";
+
 import { createClient } from "../config/client";
 
 const supabase = createClient()
-export const getCandidateResults = async (): Promise<CandidateResult[]> => {
+
+
+
+export type CandidateResult = {
+    id: string;
+    name: string;
+    category: "Miss" | "Master" | string;
+    faculty: string | null;
+    image_url: string | null;
+    total_votes: number;
+    total_amount?: number;
+    payment_count?: number;
+};
+
+export async function getCandidateResults() {
+    const supabase = createClient();
+
     const { data, error } = await supabase
-        .from("candidate_results")
+        .from("candidates_with_votes")
         .select("*")
         .order("total_votes", { ascending: false });
 
@@ -13,4 +29,4 @@ export const getCandidateResults = async (): Promise<CandidateResult[]> => {
     }
 
     return (data ?? []) as CandidateResult[];
-};
+}

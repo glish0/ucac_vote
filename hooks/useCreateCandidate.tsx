@@ -2,8 +2,9 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CreateCandidatePayload } from "@/types";
+import { CreateCandidatePayload, GetPaymentsParams } from "@/types";
 import { createCandidate, getCandidates } from "@/lib/services/candidate-service";
+import { getCandidateVoteTotalByCandidateId, getCandidateVoteTotals, getPayments, getPaymentStats } from "@/lib/services/payement-service";
 
 
 
@@ -57,7 +58,43 @@ const useCandidates = () => {
     });
 };
 
+
+
+function usePaymentStats() {
+    return useQuery({
+        queryKey: ["payment_stats"],
+        queryFn: getPaymentStats,
+    });
+}
+
+function useCandidateVoteTotals() {
+    return useQuery({
+        queryKey: ["candidate_vote_totals"],
+        queryFn: getCandidateVoteTotals,
+    });
+}
+
+function useCandidateVoteTotal(candidateId?: string) {
+    return useQuery({
+        queryKey: ["candidate_vote_totals", candidateId],
+        queryFn: () => getCandidateVoteTotalByCandidateId(candidateId!),
+        enabled: !!candidateId,
+    });
+}
+
+function usePayments(params?: GetPaymentsParams) {
+    return useQuery({
+        queryKey: ["payments", params],
+        queryFn: () => getPayments(params),
+    });
+}
+
 export {
     useCandidates,
-    useCreateCandidate
+    usePaymentStats,
+    useCreateCandidate,
+    usePayments,
+    useCandidateVoteTotals,
+    useCandidateVoteTotal
+
 }

@@ -21,13 +21,16 @@ import { VoteModalProps } from "@/types";
 import { VOTE_PRICE } from "@/constants";
 import { toast } from "sonner";
 import { VoteFormInput, VoteFormValues, voteSchema } from "@/lib/schema";
-import { useInitiatePayment } from "@/hooks/usePayment";
+
+import { pollPaymentStatus } from "@/lib/services/getStatus-service";
+import { useInitiatePayment } from "@/hooks/useInitiatePayment";
 
 
 
 export function VoteModal({ candidate, open, onOpenChange }: VoteModalProps) {
     const [loading, setLoading] = useState(false);
     const initiatePaymentMutation = useInitiatePayment();
+
 
 
     const form = useForm<VoteFormInput, unknown, VoteFormValues>({
@@ -92,8 +95,7 @@ export function VoteModal({ candidate, open, onOpenChange }: VoteModalProps) {
         });
 
         try {
-
-            await initiatePaymentMutation.mutateAsync({
+            const paymentResult = await initiatePaymentMutation.mutateAsync({
                 candidateId: candidate.id,
                 fullName: values.fullName,
                 phone: values.phone,
@@ -101,20 +103,53 @@ export function VoteModal({ candidate, open, onOpenChange }: VoteModalProps) {
                 voteCount: values.voteCount,
             });
 
-            toast.success("Demande de paiement envoyée", {
+            toast.loading("Paiement en attente", {
                 id: loadingToast,
                 description: `Confirmez le paiement de ${formatAmount(
                     amount
                 )} FCFA sur votre téléphone.`,
             });
 
-            resetForm();
-            onOpenChange(false);
-        } catch {
-            toast.error("Erreur de connexion", {
+            const statusResult = await pollPaymentStatus(paymentResult.reference);
+            console.log("PAYMENT STATUS RESULT:", statusResult);
+            if (statusResult.status === "SUCCESS") {
+                toast.success("Paiement confirmé", {
+                    id: loadingToast,
+                    description: "Votre vote a bien été pris en compte.",
+                });
+
+                resetForm();
+                onOpenChange(false);
+                return;
+            }
+
+            if (statusResult.status === "FAILED") {
+                toast.error("Paiement échoué", {
+                    id: loadingToast,
+                    description: "Le paiement a échoué ou a été annulé.",
+                });
+
+                return;
+            }
+
+            toast.info("Paiement toujours en attente", {
                 id: loadingToast,
                 description:
-                    "Une erreur est survenue pendant l'initialisation du paiement.",
+                    "Votre paiement est en cours de traitement. Vous pouvez vérifier plus tard.",
+            });
+        } catch (error) {
+            console.error("Payment modal error:", error);
+
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : typeof error === "string"
+                        ? error
+                        : "Une erreur est survenue pendant l'initialisation du paiement.";
+
+            toast.error("Erreur de paiement", {
+                id: loadingToast,
+                description: errorMessage,
             });
         } finally {
             setLoading(false);

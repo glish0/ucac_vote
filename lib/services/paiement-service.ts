@@ -17,7 +17,7 @@ export type InitiatePaymentResponse = {
 export const initiatePayment = async (
     payload: InitiatePaymentPayload
 ): Promise<InitiatePaymentResponse> => {
-    const response = await fetch("/api/payments/initiate", {
+    const response = await fetch("/api/payment/initiate", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
