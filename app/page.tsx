@@ -1,65 +1,93 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+import { useState } from "react";
+
+import { CandidateGrid } from "@/components/shared/CandidatSection";
+import { HowToVote } from "@/components/shared/CommentVoter";
+import { VoteFooter } from "@/components/shared/Footer";
+import { VoteHeader } from "@/components/shared/Header";
+import { VoteHero } from "@/components/shared/HeroSection";
+import { ImportantInfo } from "@/components/shared/InformationVote";
+import { VoteModal } from "@/components/shared/VoteModal";
+
+
+import { CandidateResponse } from "@/types";
+import { AppLoader } from "@/components/shared/AppLoader";
+import { Button } from "@/components/ui/button";
+import { useCandidates } from "@/hooks/useCreateCandidate";
+
+export default function HomePage() {
+  const [selectedCandidate, setSelectedCandidate] =
+    useState<CandidateResponse | null>(null);
+
+  const {
+    data: candidates = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useCandidates();
+
+  if (isLoading) {
+    return (
+      <AppLoader
+        title="Chargement des candidats"
+        description="Nous préparons la liste des candidats Miss & Master UCAC."
+      />
+    );
+  }
+
+  if (isError) {
+    return (
+      <main className="flex min-h-screen items-center justify-center ucac-page-bg px-6 text-white">
+        <div className="max-w-md rounded-[2rem] border border-white/10 bg-white/10 p-6 text-center backdrop-blur-2xl">
+          <h1 className="text-2xl font-black">
+            Impossible de charger les candidats
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="mt-3 text-sm leading-6 text-white/60">
+            {error instanceof Error
+              ? error.message
+              : "Une erreur est survenue pendant le chargement."}
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+          <Button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="mt-6 rounded-full bg-[#b8252c] font-bold hover:bg-[#d32d35]"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {isFetching ? "Chargement..." : "Réessayer"}
+          </Button>
         </div>
       </main>
-    </div>
+    );
+  }
+
+  return (
+    <main className="min-h-screen overflow-hidden ucac-page-bg text-white">
+      <VoteHeader />
+
+      <VoteHero candidates={candidates} />
+
+      <HowToVote />
+
+      <CandidateGrid
+        candidates={candidates}
+        onSelectCandidate={setSelectedCandidate}
+      />
+
+      <ImportantInfo />
+
+      <VoteFooter />
+
+      <VoteModal
+        candidate={selectedCandidate}
+        open={!!selectedCandidate}
+        onOpenChange={(open) => {
+          if (!open) setSelectedCandidate(null);
+        }}
+      />
+    </main>
   );
 }
