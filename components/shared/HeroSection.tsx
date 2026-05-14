@@ -13,7 +13,7 @@ export function VoteHero({ candidates }: VoteHeroProps) {
     const masterCount = candidates.filter((candidate) => candidate.category === "Master").length;
 
     return (
-        <section className="page-container grid items-center gap-10 pb-16 pt-12 lg:grid-cols-[1.1fr_0.9fr] lg:pb-16 lg:pt-16">
+        <section className="page-container grid items-center gap-10 pb-16 pt-12 lg:grid-cols-[1.1fr_0.9fr] lg:pb-14 lg:pt-14">
             <div>
                 <div className="badge-glass mb-6">
                     Concours officiel Miss & Master UCAC
@@ -23,7 +23,7 @@ export function VoteHero({ candidates }: VoteHeroProps) {
                     Votez pour l’élégance, le charisme et le leadership étudiant.
                 </h1>
 
-                <p className="mt-6 max-w-2xl text-base leading-8 text-white/65 md:text-base">
+                <p className="mt-6 max-w-2xl text-base leading-5 text-white/65 md:text-base">
                     Participez au choix du public pour le concours Miss/Master UCAC.
                     Sélectionnez votre candidat préféré, choisissez le nombre de votes,
                     puis confirmez le paiement via Orange Money ou MTN Mobile Money.
